@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>David Rubekeil — Bauforschung</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--text:#1a1a18;--muted:#6b6b67;--border:#1a1a18;--border-light:rgba(26,26,24,0.15);--bg:#faf9f7;--card:#f3f1ec}
+    body{font-family:"IBM Plex Mono",monospace;background:var(--bg);color:var(--text);min-height:100vh}
+    .wrap{max-width:860px;margin:0 auto;padding:0 2rem}
+
+    /* HEADER */
+    .br-header{display:grid;grid-template-columns:1fr 1fr;border-bottom:1.5px solid var(--border)}
+    .br-title-block{padding:1.25rem 1rem 1.25rem 0;border-right:1.5px solid var(--border)}
+    .br-title-block .name{font-size:13px;font-weight:500;line-height:1.3;text-transform:uppercase;letter-spacing:.03em}
+    .br-title-block .sub{font-size:11px;font-weight:300;color:var(--muted);margin-top:.2rem}
+    .br-nav{display:flex;align-items:center;gap:8px;padding:1.25rem 0 1.25rem 1rem;flex-wrap:wrap}
+    .br-nav-btn{font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:400;letter-spacing:.05em;text-transform:uppercase;padding:5px 14px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer;transition:background .12s,color .12s}
+    .br-nav-btn:hover,.br-nav-btn.active{background:var(--text);color:var(--bg)}
+
+    /* BODY */
+    .br-body{display:grid;grid-template-columns:160px 1fr}
+    .br-sidebar{border-right:1.5px solid var(--border);padding:1.25rem 1rem 1.25rem 0}
+    .br-sidebar-label{font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:.6rem}
+    .br-sidebar-item{font-size:11px;font-weight:300;letter-spacing:.03em;padding:.4rem 0;border-bottom:.5px solid var(--border-light);cursor:pointer;color:var(--muted);transition:color .12s}
+    .br-sidebar-item:first-of-type{border-top:.5px solid var(--border-light)}
+    .br-sidebar-item:hover,.br-sidebar-item.active{color:var(--text);font-weight:500}
+
+    /* CONTENT */
+    .br-content{padding:1.5rem 0 1.5rem 1.5rem}
+    .proj-block{margin-bottom:1.75rem;padding-bottom:1.75rem;border-bottom:.5px solid var(--border-light)}
+    .proj-block:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+    .proj-meta{display:flex;align-items:center;gap:8px;margin-bottom:.4rem;flex-wrap:wrap}
+    .proj-year{font-size:10px;font-weight:300;color:var(--muted)}
+    .proj-tag{font-size:9px;font-weight:400;text-transform:uppercase;letter-spacing:.08em;border:.5px solid var(--border-light);padding:2px 9px;border-radius:999px;color:var(--muted)}
+    .wip-tag{font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;border:1px solid var(--text);padding:2px 9px;border-radius:999px;color:var(--text)}
+    .proj-title{font-size:18px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;line-height:1.15;margin-bottom:.2rem}
+    .proj-subtitle{font-size:11px;font-weight:300;color:var(--muted);margin-bottom:.75rem;line-height:1.5}
+    .proj-desc{font-size:12px;font-weight:300;color:var(--muted);line-height:1.7;margin-bottom:.85rem}
+    .read-btn{font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:400;text-transform:uppercase;letter-spacing:.06em;color:var(--text);background:none;border:1px solid var(--border);padding:5px 14px;border-radius:999px;cursor:pointer;transition:background .12s,color .12s}
+    .read-btn:hover{background:var(--text);color:var(--bg)}
+
+    /* FOOTER */
+    .br-footer{border-top:1.5px solid var(--border);padding:.85rem 0;display:flex;justify-content:space-between;font-size:10px;font-weight:300;color:var(--muted);letter-spacing:.04em}
+
+    /* KONTAKT PAGE */
+    .kontakt-block{padding:1.5rem 0 1.5rem 1.5rem}
+    .kontakt-row{display:flex;gap:2rem;padding:.6rem 0;border-bottom:.5px solid var(--border-light);font-size:12px}
+    .kontakt-row:first-child{border-top:.5px solid var(--border-light)}
+    .kontakt-label{font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);width:80px;flex-shrink:0;padding-top:2px}
+
+    /* PDF OVERLAY */
+    .pdf-overlay{display:none;position:fixed;inset:0;background:var(--bg);z-index:200;flex-direction:column}
+    .pdf-overlay.open{display:flex}
+    .pdf-bar{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;border-bottom:1.5px solid var(--border);flex-shrink:0}
+    .pdf-bar-title{font-size:10px;font-weight:300;color:var(--muted);letter-spacing:.05em;text-transform:uppercase}
+    .pdf-frame{flex:1;width:100%;border:none}
+
+    /* PAGE SWITCHING */
+    .page{display:none}.page.active{display:block}
+
+    @media(max-width:600px){
+      .br-header,.br-body{grid-template-columns:1fr}
+      .br-title-block{border-right:none;border-bottom:1.5px solid var(--border)}
+      .br-sidebar{border-right:none;border-bottom:1.5px solid var(--border);padding:1rem 0}
+      .br-content,.kontakt-block{padding:1.25rem 0}
+    }
+  </style>
+</head>
+<body>
+
+<div class="pdf-overlay" id="pdfOverlay">
+  <div class="pdf-bar">
+    <span class="pdf-bar-title">Heimat in Serie — Holzbau Schneider, Lindau (Teil I)</span>
+    <button class="read-btn" onclick="closePdf()">Schliessen x</button>
+  </div>
+  <iframe class="pdf-frame" id="pdfFrame" src=""></iframe>
+</div>
+
+<div class="wrap">
+  <div class="br-header">
+    <div class="br-title-block">
+      <p class="name">David Rubekeil<br>Bauforschung</p>
+      <p class="sub">Universitat Innsbruck</p>
+    </div>
+    <div class="br-nav">
+      <button class="br-nav-btn active" onclick="showPage('arbeiten',this)">Arbeiten</button>
+      <button class="br-nav-btn" onclick="showPage('kontakt',this)">Kontakt</button>
+    </div>
+  </div>
+
+  <!-- ARBEITEN -->
+  <div class="page active" id="page-arbeiten">
+    <div class="br-body">
+      <div class="br-sidebar">
+        <p class="br-sidebar-label">Filter</p>
+        <div class="br-sidebar-item active" onclick="filter('alle',this)">Alle</div>
+        <div class="br-sidebar-item" onclick="filter('diplomarbeit',this)">Diplomarbeit</div>
+        <div class="br-sidebar-item" onclick="filter('bauforschung',this)">Bauforschung</div>
+      </div>
+      <div class="br-content">
+
+        <div class="proj-block" data-cat="diplomarbeit">
+          <div class="proj-meta">
+            <span class="proj-year">2025</span>
+            <span class="proj-tag">Diplomarbeit</span>
+            <span class="wip-tag">in Arbeit</span>
+          </div>
+          <p class="proj-title">Heimat in Serie</p>
+          <p class="proj-subtitle">Serielle Holzhauser der Moderne am Beispiel Holzbau Schneider in Lindau</p>
+          <p class="proj-desc">Untersuchung der historischen und architektonischen Bedeutung des seriellen Holzbaus am Bodensee &mdash; von der handwerklichen Zimmerei zur industriellen Produktion, zwischen Heimatstil und rationaler Vorfertigung. Leopold-Franzens-Universitat Innsbruck, Betreuer: Priv.-Doz. Dr. Christoph Holz.</p>
+          <button class="read-btn" onclick="openPdf()">Arbeit lesen &rarr;</button>
+        </div>
+
+        <div class="proj-block" data-cat="bauforschung">
+          <div class="proj-meta">
+            <span class="proj-year">2024</span>
+            <span class="proj-tag">Bauforschung</span>
+          </div>
+          <p class="proj-title">Stift Wilten</p>
+          <p class="proj-subtitle">Baugeschichtliche Analyse, Innsbruck</p>
+          <p class="proj-desc">Baukonstruktive und materielle Untersuchung des Pramonstratensersti fts &mdash; Umbauphasen, Schichtung und Materialgeschichte.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- KONTAKT -->
+  <div class="page" id="page-kontakt">
+    <div class="br-body">
+      <div class="br-sidebar"></div>
+      <div class="kontakt-block">
+        <div class="kontakt-row"><span class="kontakt-label">E-Mail</span><span>david@rubekeil.de</span></div>
+        <div class="kontakt-row"><span class="kontakt-label">Universitat</span><span>uibk.ac.at</span></div>
+        <div class="kontakt-row"><span class="kontakt-label">Standort</span><span>Innsbruck / D</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="br-footer">
+    <span>David Rubekeil &middot; Bauforschung &middot; Innsbruck</span>
+    <span>&copy; 2025</span>
+  </div>
+</div>
+
+<script>
+function showPage(id, btn) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById("page-" + id).classList.add("active");
+  document.querySelectorAll(".br-nav-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+}
+function filter(cat, el) {
+  document.querySelectorAll(".br-sidebar-item").forEach(i => i.classList.remove("active"));
+  el.classList.add("active");
+  document.querySelectorAll(".proj-block").forEach(b => {
+    b.style.display = (cat === "alle" || b.dataset.cat === cat) ? "block" : "none";
+  });
+}
+function openPdf() {
+  document.getElementById("pdfFrame").src = "heimat-in-serie.pdf";
+  document.getElementById("pdfOverlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+function closePdf() {
+  document.getElementById("pdfOverlay").classList.remove("open");
+  document.getElementById("pdfFrame").src = "";
+  document.body.style.overflow = "";
+}
+document.addEventListener("keydown", e => { if (e.key === "Escape") closePdf(); });
+</script>
+</body>
+</html>
